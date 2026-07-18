@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue - MANJUNATH HAIR SALON</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .timer-container {
+            background: linear-gradient(135deg, var(--secondary), #2A2A4A);
+            border-radius: var(--radius);
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            color: var(--white);
+            text-align: center;
+        }
+        .timer-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+        .timer-label {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        .timer-progress {
+            margin-top: 15px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .timer-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #FFD700);
+            border-radius: 3px;
+            transition: width 1s linear;
+            width: 100%;
+        }
+        .queue-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+        .queue-item:hover {
+            background: rgba(201, 168, 76, 0.05);
+        }
+        .position-badge {
+            background: var(--primary);
+            color: var(--white);
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .wait-time-badge {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .position-highlight {
+            background: rgba(201, 168, 76, 0.15);
+            border-left: 3px solid var(--primary);
+        }
+        .pulse-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-scissors"></i>
+                <span>MANJUNATH</span>
+                <small>HAIR SALON</small>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('services') }}">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('book') }}">Book</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('queue') }}">Queue</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-nav" href="{{ url_for('admin_login') }}">
+                            <i class="fas fa-user-shield"></i> Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Queue Section -->
+    <section style="padding: 120px 0 80px; background: var(--light); min-height: 100vh;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <div class="section-header">
+                        <span class="subtitle">Live Queue</span>
+                        <h2>Smart Queue <span>Management</span></h2>
+                        <p>Join the queue and get AI-powered wait time predictions</p>
+                    </div>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Live Timer Display -->
+                    <div class="timer-container">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 text-md-start">
+                                <div style="font-size: 14px; opacity: 0.7;">
+                                    <span class="pulse-dot"></span> Live Queue Status
+                                </div>
+                                <div style="font-size: 20px; font-weight: 600; margin-top: 5px;">
+                                    <span id="queueCountDisplay">{{ queue_entries|length }}</span> people waiting
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <div class="timer-label">Estimated Wait Time</div>
+                                <div class="timer-display" id="waitTimer">--:--</div>
+                            </div>
+                        </div>
+                        <div class="timer-progress">
+                            <div class="timer-progress-bar" id="timerProgress" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Queue List -->
+                        <div class="col-lg-8">
+                            <div style="background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 30px;">
+                                <h4 style="font-weight: 600; color: var(--secondary); margin-bottom: 20px;">
+                                    <i class="fas fa-list" style="color: var(--primary);"></i> Current Queue
+                                    <span style="float: right; font-size: 14px; font-weight: 400; color: rgba(0,0,0,0.4);" id="queueCount">
+                                        {{ queue_entries|length }} waiting
+                                    </span>
+                                </h4>
+
+                                <div id="queueList">
+                                    {% if queue_entries %}
+                                        {% for entry in queue_entries %}
+                                            <div class="queue-item {% if loop.index == 1 %}position-highlight{% endif %}">
+                                                <div>
+                                                    <span class="position-badge">#{{ entry.position }}</span>
+                                                    <strong style="margin-left: 12px; color: var(--secondary); font-size: 16px;">
+                                                        {{ entry.user.name if entry.user else 'Guest' }}
+                                                        {% if loop.index == 1 %}
+                                                            <span style="font-size: 11px; background: #4CAF50; color: white; padding: 2px 10px; border-radius: 12px; margin-left: 8px;">
+                                                                <i class="fas fa-phone"></i> Next
+                                                            </span>
+                                                        {% endif %}
+                                                    </strong>
+                                                    <span style="margin-left: 10px; font-size: 13px; color: rgba(0,0,0,0.4);">
+                                                        <i class="fas fa-cut"></i> {{ entry.service.name if entry.service else 'N/A' }}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="wait-time-badge">
+                                                        <i class="far fa-clock"></i> <span class="entry-wait-time" data-position="{{ entry.position }}">{{ entry.estimated_wait_time }}</span> min
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div style="text-align: center; padding: 40px 0;">
+                                            <i class="fas fa-users" style="font-size: 48px; color: rgba(0,0,0,0.1);"></i>
+                                            <p style="color: rgba(0,0,0,0.4); margin-top: 15px;">Queue is empty. Be the first to join!</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Join Queue Form -->
+                        <div class="col-lg-4">
+                            <div style="background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 30px;">
+                                <h4 style="font-weight: 600; color: var(--secondary); margin-bottom: 20px;">
+                                    <i class="fas fa-plus-circle" style="color: var(--primary);"></i> Join Queue
+                                </h4>
+
+                                <form method="POST" action="{{ url_for('queue') }}">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-user" style="color: var(--primary);"></i> Your Name
+                                        </label>
+                                        <input type="text" class="form-control" name="customer_name" placeholder="Enter your name" required
+                                               style="border-radius: 10px; padding: 12px 15px; border: 2px solid #e0e0e0;">
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-phone" style="color: var(--primary);"></i> Phone Number
+                                        </label>
+                                        <input type="tel" class="form-control" name="phone" placeholder="Enter your phone" required
+                                               style="border-radius: 10px; padding: 12px 15px; border: 2px solid #e0e0e0;">
+                                        <small style="color: rgba(0,0,0,0.4); font-size: 12px; display: block; margin-top: 5px;">
+                                            <i class="fas fa-lock" style="font-size: 10px;"></i> Your phone number is private
+                                        </small>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="form-label fw-semibold">
+                                            <i class="fas fa-cut" style="color: var(--primary);"></i> Service
+                                        </label>
+                                        <select class="form-select" name="service_id" required
+                                                style="border-radius: 10px; padding: 12px 15px; border: 2px solid #e0e0e0;">
+                                            <option value="">Choose a service...</option>
+                                            {% for service in services %}
+                                                <option value="{{ service.id }}">
+                                                    {{ service.name }} (₹{{ service.price }} - {{ service.duration }} min)
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-100"
+                                            style="border-radius: 50px; padding: 12px; background: var(--primary); border: none; color: var(--dark); font-weight: 600;">
+                                        <i class="fas fa-sign-in-alt"></i> Join Queue
+                                    </button>
+                                </form>
+
+                                <hr style="margin: 20px 0;">
+
+                                <div style="font-size: 13px; color: rgba(0,0,0,0.5);">
+                                    <i class="fas fa-info-circle" style="color: var(--primary);"></i>
+                                    <strong>How it works:</strong>
+                                    <ul style="padding-left: 20px; margin-top: 8px;">
+                                        <li>Join the queue with your name and phone</li>
+                                        <li>Get AI-powered wait time prediction</li>
+                                        <li>Track your position in real-time</li>
+                                        <li>Your phone number is private</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="footer-brand">
+                        <i class="fas fa-scissors"></i>
+                        <span>MANJUNATH</span>
+                        <small>HAIR SALON</small>
+                    </div>
+                    <p>Premium grooming services with a touch of tradition and modern precision.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('services') }}">Services</a></li>
+                        <li><a href="{{ url_for('book') }}">Book</a></li>
+                        <li><a href="{{ url_for('queue') }}">Queue</a></li>
+                        <li><a href="{{ url_for('about') }}">About</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact</h5>
+                    <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                    <p><i class="fas fa-envelope"></i> info@manjunathsalon.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Your City, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 MANJUNATH HAIR SALON. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Timer variables
+        let totalSeconds = 0;
+        let timerInterval = null;
+
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // Start the live timer
+        function startTimer(initialMinutes) {
+            // Stop any existing timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            // Set initial wait time in seconds
+            let currentWaitTime = Math.max(0, initialMinutes * 60);
+            totalSeconds = currentWaitTime;
+
+            if (currentWaitTime <= 0) {
+                document.getElementById('waitTimer').textContent = '00:00';
+                document.getElementById('timerProgress').style.width = '100%';
+                return;
+            }
+
+            updateTimerDisplay(currentWaitTime);
+
+            timerInterval = setInterval(function() {
+                if (currentWaitTime > 0) {
+                    currentWaitTime--;
+                    updateTimerDisplay(currentWaitTime);
+                } else {
+                    // Timer reached zero
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    document.getElementById('waitTimer').textContent = '00:00';
+                    document.getElementById('timerProgress').style.width = '100%';
+                    document.getElementById('timerProgress').style.background = 'linear-gradient(90deg, #4CAF50, #66BB6A)';
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay(seconds) {
+            const timerElement = document.getElementById('waitTimer');
+            timerElement.textContent = formatTime(seconds);
+
+            // Update progress bar
+            if (totalSeconds > 0) {
+                const progress = (seconds / totalSeconds) * 100;
+                document.getElementById('timerProgress').style.width = progress + '%';
+            }
+        }
+
+        // Auto-refresh queue every 10 seconds
+        function updateQueue() {
+            fetch('/api/queue/status')
+                .then(response => response.json())
+                .then(data => {
+                    // Update queue list
+                    const queueList = document.getElementById('queueList');
+                    if (data.entries && data.entries.length > 0) {
+                        queueList.innerHTML = data.entries.map((entry, index) => `
+                            <div class="queue-item ${index === 0 ? 'position-highlight' : ''}">
+                                <div>
+                                    <span class="position-badge">#${entry.position}</span>
+                                    <strong style="margin-left: 12px; color: var(--secondary); font-size: 16px;">
+                                        ${entry.user_name}
+                                        ${index === 0 ? `<span style="font-size: 11px; background: #4CAF50; color: white; padding: 2px 10px; border-radius: 12px; margin-left: 8px;">
+                                            <i class="fas fa-phone"></i> Next
+                                        </span>` : ''}
+                                    </strong>
+                                    <span style="margin-left: 10px; font-size: 13px; color: rgba(0,0,0,0.4);">
+                                        <i class="fas fa-cut"></i> ${entry.service_name}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="wait-time-badge">
+                                        <i class="far fa-clock"></i> ${entry.estimated_wait} min
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        queueList.innerHTML = `
+                            <div style="text-align: center; padding: 40px 0;">
+                                <i class="fas fa-users" style="font-size: 48px; color: rgba(0,0,0,0.1);"></i>
+                                <p style="color: rgba(0,0,0,0.4); margin-top: 15px;">Queue is empty. Be the first to join!</p>
+                            </div>
+                        `;
+                    }
+
+                    // Update counts
+                    const queueLength = data.queue_length || 0;
+                    document.getElementById('queueCount').textContent = `${queueLength} waiting`;
+                    document.getElementById('queueCountDisplay').textContent = queueLength;
+
+                    // Calculate and update wait time
+                    const waitMinutes = queueLength * 15;
+
+                    // Start or update timer
+                    if (waitMinutes > 0) {
+                        startTimer(waitMinutes);
+                    } else {
+                        // Stop timer if queue is empty
+                        if (timerInterval) {
+                            clearInterval(timerInterval);
+                            timerInterval = null;
+                        }
+                        document.getElementById('waitTimer').textContent = '00:00';
+                        document.getElementById('timerProgress').style.width = '100%';
+                    }
+                })
+                .catch(error => console.error('Error updating queue:', error));
+        }
+
+        // Initial timer setup
+        function initializeTimer() {
+            const queueLength = {{ queue_entries|length }};
+            const waitMinutes = queueLength * 15;
+            if (waitMinutes > 0) {
+                startTimer(waitMinutes);
+            } else {
+                document.getElementById('waitTimer').textContent = '00:00';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTimer();
+            // Update every 10 seconds
+            setInterval(updateQueue, 10000);
+            // Initial update after 1 second
+            setTimeout(updateQueue, 1000);
+        });
+    </script>
+</body>
+</html>

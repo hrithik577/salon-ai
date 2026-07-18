@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANJUNATH HAIR SALON - Premium Grooming</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .developer-badge {
+            background: linear-gradient(135deg, #1A1A2E, #2A2A4A);
+            border-radius: var(--radius);
+            padding: 40px;
+            margin-top: 50px;
+            color: white;
+            text-align: center;
+            border: 2px solid rgba(201, 168, 76, 0.2);
+        }
+        .developer-badge .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            color: var(--dark);
+        }
+        .developer-badge h4 {
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+        }
+        .developer-badge .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .developer-badge .social-links a {
+            color: white;
+            font-size: 24px;
+            transition: var(--transition);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        .developer-badge .social-links a:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: translateY(-5px);
+        }
+        .contact-btn {
+            background: var(--primary);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: var(--dark);
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .contact-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(201, 168, 76, 0.3);
+            color: var(--dark);
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .feature-list li i {
+            color: var(--primary);
+            width: 25px;
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .testimonial-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            height: 100%;
+            transition: var(--transition);
+        }
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        .testimonial-card .stars {
+            color: #FFD700;
+            font-size: 18px;
+        }
+        .testimonial-card .customer-name {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-top: 10px;
+        }
+        .value-prop {
+            text-align: center;
+            padding: 20px;
+        }
+        .value-prop .number {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+        }
+        .value-prop .label {
+            color: rgba(0,0,0,0.5);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-scissors"></i>
+                <span>MANJUNATH</span>
+                <small>HAIR SALON</small>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('services') }}">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('book') }}">Book</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('queue') }}">Queue</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-nav" href="{{ url_for('admin_login') }}">
+                            <i class="fas fa-user-shield"></i> Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center min-vh-75">
+                <div class="col-lg-6 hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-star"></i> Premium Grooming Since 2010
+                    </div>
+                    <h1 class="hero-title">
+                        Where Style<br>
+                        <span>Meets Precision</span>
+                    </h1>
+                    <p class="hero-text">
+                        Experience the art of grooming with our expert barbers.
+                        From classic cuts to modern styles, we craft perfection.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="{{ url_for('book') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-calendar-check"></i> Book Appointment
+                        </a>
+                        <a href="{{ url_for('queue') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-clock"></i> Join Queue
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="number">10+</span>
+                            <span class="label">Years Experience</span>
+                        </div>
+                        <div class="stat">
+                            <span class="number">{{ services|length }}</span>
+                            <span class="label">Services</span>
+                        </div>
+                        <div class="stat">
+                            <span class="number">{{ queue_count }}</span>
+                            <span class="label">In Queue</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image">
+                        <img src="{{ url_for('static', filename='images/hero-bg.jpg') }}" alt="Salon" class="img-fluid">
+                        <div class="floating-card">
+                            <i class="fas fa-robot"></i>
+                            <div>
+                                <strong>AI Powered</strong>
+                                <span>Smart Queue System</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-pattern"></div>
+    </section>
+
+    <!-- Value Propositions -->
+    <section style="padding: 60px 0; background: var(--white);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="value-prop">
+                        <div class="number">500+</div>
+                        <div class="label">Happy Customers</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="value-prop">
+                        <div class="number">8</div>
+                        <div class="label">Expert Stylists</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="value-prop">
+                        <div class="number">4.9★</div>
+                        <div class="label">Average Rating</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="value-prop">
+                        <div class="number">15min</div>
+                        <div class="label">Avg. Wait Time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Preview -->
+    <section class="services-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="subtitle">Our Services</span>
+                <h2>Premium Grooming <span>Services</span></h2>
+                <p>Discover our range of professional grooming services</p>
+            </div>
+            <div class="row g-4">
+                {% for service in services[:6] %}
+                <div class="col-md-4">
+                    <div class="service-card">
+                        <div class="service-icon">
+                            <i class="fas fa-cut"></i>
+                        </div>
+                        <h4>{{ service.name }}</h4>
+                        <p>{{ service.description }}</p>
+                        <div class="service-meta">
+                            <span class="price">₹{{ service.price }}</span>
+                            <span class="duration"><i class="far fa-clock"></i> {{ service.duration }} min</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-5">
+                <a href="{{ url_for('services') }}" class="btn btn-outline-primary">
+                    View All Services <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Features -->
+    <section class="ai-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="ai-content">
+                        <span class="subtitle">AI Technology</span>
+                        <h2>Smart Queue <span>Management</span></h2>
+                        <p>Our AI-powered system predicts wait times so you can plan your visit better.</p>
+                        <ul class="ai-features">
+                            <li>
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <strong>Real-time Predictions</strong>
+                                    <span>Get accurate wait time estimates</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-chart-line"></i>
+                                <div>
+                                    <strong>Busy Hour Detection</strong>
+                                    <span>Know when to visit for shorter waits</span>
+                                </div>
+                            </li>
+                            <li>
+                                <i class="fas fa-mobile-alt"></i>
+                                <div>
+                                    <strong>Remote Queue Join</strong>
+                                    <span>Join the queue from anywhere</span>
+                                </div>
+                            </li>
+                        </ul>
+                        <a href="{{ url_for('queue') }}" class="btn btn-primary">
+                            <i class="fas fa-users"></i> View Queue Status
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="ai-visual">
+                        <div class="ai-card">
+                            <div class="ai-header">
+                                <i class="fas fa-robot"></i>
+                                <span>AI Predictor</span>
+                            </div>
+                            <div class="ai-body">
+                                <div class="prediction-item">
+                                    <span>Current Queue</span>
+                                    <strong>{{ queue_count }} people</strong>
+                                </div>
+                                <div class="prediction-item">
+                                    <span>Estimated Wait</span>
+                                    <strong>{{ (queue_count * 15) if queue_count > 0 else 0 }} min</strong>
+                                </div>
+                                <div class="prediction-item">
+                                    <span>Busy Hours</span>
+                                    <strong>10AM-1PM, 5PM-8PM</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section style="padding: 80px 0; background: var(--light);">
+        <div class="container">
+            <div class="section-header">
+                <span class="subtitle">Testimonials</span>
+                <h2>What Our <span>Customers Say</span></h2>
+                <p>Real reviews from our satisfied customers</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p style="margin-top: 15px; color: rgba(0,0,0,0.6);">"Best haircut I've ever had! The AI queue system is amazing, I didn't have to wait long at all."</p>
+                        <div class="customer-name">Rahul Sharma</div>
+                        <small style="color: rgba(0,0,0,0.4);">Regular Customer</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p style="margin-top: 15px; color: rgba(0,0,0,0.6);">"Professional service and great atmosphere. The AI wait time prediction is super accurate!"</p>
+                        <div class="customer-name">Priya Patel</div>
+                        <small style="color: rgba(0,0,0,0.4);">First-time Visitor</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p style="margin-top: 15px; color: rgba(0,0,0,0.6);">"The barbers here are experts. Love that I can join the queue from my phone!"</p>
+                        <div class="customer-name">Amit Kumar</div>
+                        <small style="color: rgba(0,0,0,0.4);">Loyal Customer</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Developer / Business Automation Section -->
+    <section style="padding: 80px 0; background: var(--white);">
+        <div class="container">
+            <div class="developer-badge">
+                <div class="profile-img">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h4>🚀 Business Automation Solution</h4>
+                <p style="color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto 20px;">
+                    This website was built with AI-powered queue management system.
+                    For more business automation solutions, contact the developer.
+                </p>
+
+                <div class="row" style="max-width: 600px; margin: 20px auto;">
+                    <div class="col-md-6 text-start">
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle"></i> AI Queue Management</li>
+                            <li><i class="fas fa-check-circle"></i> Smart Appointment Booking</li>
+                            <li><i class="fas fa-check-circle"></i> Real-time Analytics</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6 text-start">
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle"></i> Customer Management</li>
+                            <li><i class="fas fa-check-circle"></i> Revenue Tracking</li>
+                            <li><i class="fas fa-check-circle"></i> Automated Notifications</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; margin: 20px 0;">
+                    <p style="color: rgba(255,255,255,0.5); font-size: 14px;">
+                        <i class="fas fa-user-tie"></i> Developed by: <strong style="color: var(--primary);">B HRITHIK</strong>
+                    </p>
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                        <a href="tel:7411635792" style="color: rgba(255,255,255,0.7); text-decoration: none;">
+                            <i class="fas fa-phone" style="color: var(--primary);"></i> +91 7411635792
+                        </a>
+                        <a href="mailto:bhrithik74@gmail.com" style="color: rgba(255,255,255,0.7); text-decoration: none;">
+                            <i class="fas fa-envelope" style="color: var(--primary);"></i> bhrithik74@gmail.com
+                        </a>
+                    </div>
+                </div>
+
+                <div class="social-links">
+                    <a href="https://www.linkedin.com/in/b-hrithik-2b7701387" target="_blank" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://github.com" target="_blank" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://twitter.com" target="_blank" title="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://instagram.com" target="_blank" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <a href="mailto:bhrithik74@gmail.com?subject=Business%20Automation%20Inquiry" class="contact-btn">
+                        <i class="fas fa-rocket"></i> Get Business Automation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="footer-brand">
+                        <i class="fas fa-scissors"></i>
+                        <span>MANJUNATH</span>
+                        <small>HAIR SALON</small>
+                    </div>
+                    <p>Premium grooming services with a touch of tradition and modern precision.</p>
+                    <small style="color: rgba(255,255,255,0.3);">
+                        <i class="fas fa-code"></i> Built with ❤️ by B HRITHIK
+                    </small>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('services') }}">Services</a></li>
+                        <li><a href="{{ url_for('book') }}">Book</a></li>
+                        <li><a href="{{ url_for('queue') }}">Queue</a></li>
+                        <li><a href="{{ url_for('about') }}">About</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact</h5>
+                    <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                    <p><i class="fas fa-envelope"></i> info@manjunathsalon.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Your City, India</p>
+                    <hr style="border-color: rgba(255,255,255,0.05);">
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.3);">
+                        <i class="fas fa-rocket"></i> Need automation? Contact: <br>
+                        <a href="tel:7411635792" style="color: var(--primary); text-decoration: none;">+91 7411635792</a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 MANJUNATH HAIR SALON. All rights reserved. | Designed by <strong style="color: var(--primary);">B HRITHIK</strong></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

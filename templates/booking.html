@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - MANJUNATH HAIR SALON</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-scissors"></i>
+                <span>MANJUNATH</span>
+                <small>HAIR SALON</small>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('services') }}">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('book') }}">Book</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('queue') }}">Queue</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-nav" href="{{ url_for('admin_login') }}">
+                            <i class="fas fa-user-shield"></i> Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Booking Section -->
+    <section style="padding: 120px 0 80px; background: var(--light); min-height: 100vh;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="section-header">
+                        <span class="subtitle">Book Now</span>
+                        <h2>Schedule Your <span>Appointment</span></h2>
+                        <p>Fill in your details and we'll confirm your booking</p>
+                    </div>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div style="background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 40px;">
+                        <form method="POST" action="{{ url_for('book') }}" id="bookingForm">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-user" style="color: var(--primary);"></i> Your Name
+                                </label>
+                                <input type="text" class="form-control" name="name" placeholder="Enter your full name" required
+                                       style="border-radius: 10px; padding: 12px 15px; border: 2px solid #e0e0e0; font-size: 16px;">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-phone" style="color: var(--primary);"></i> Phone Number
+                                </label>
+                                <input type="tel" class="form-control" name="phone" placeholder="Enter your phone number" required
+                                       style="border-radius: 10px; padding: 12px 15px; border: 2px solid #e0e0e0; font-size: 16px;">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-cut" style="color: var(--primary);"></i> Select Service
+                                </label>
+                                <select class="form-select" name="service_id" required
+                                        style="border-radius: 10px; padding: 12px 15px; border: 2px solid #e0e0e0; font-size: 16px;">
+                                    <option value="">Choose a service...</option>
+                                    {% for service in services %}
+                                        <option value="{{ service.id }}">
+                                            {{ service.name }} - ₹{{ service.price }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="alert alert-info" style="background: rgba(201, 168, 76, 0.1); border-color: var(--primary); color: var(--secondary); border-radius: 10px;">
+                                <i class="fas fa-clock"></i>
+                                <strong>Queue Status:</strong>
+                                {% if queue_count > 0 %}
+                                    There are <strong>{{ queue_count }}</strong> people in queue.
+                                    <br>Your estimated appointment time will be calculated based on the queue.
+                                {% else %}
+                                    Queue is empty. You will get the next available slot.
+                                {% endif %}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100"
+                                    style="padding: 15px; font-size: 18px; border-radius: 50px; background: var(--primary); border: none; color: var(--dark); font-weight: 600;">
+                                <i class="fas fa-calendar-check"></i> Book Appointment
+                            </button>
+                        </form>
+
+                        <hr style="margin: 20px 0;">
+
+                        <div style="text-align: center; color: rgba(0,0,0,0.4); font-size: 13px;">
+                            <i class="fas fa-info-circle"></i>
+                            Your appointment time will be automatically calculated based on the current queue.
+                            <br>We'll confirm your booking within 24 hours.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="footer-brand">
+                        <i class="fas fa-scissors"></i>
+                        <span>MANJUNATH</span>
+                        <small>HAIR SALON</small>
+                    </div>
+                    <p>Premium grooming services with a touch of tradition and modern precision.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('services') }}">Services</a></li>
+                        <li><a href="{{ url_for('book') }}">Book</a></li>
+                        <li><a href="{{ url_for('queue') }}">Queue</a></li>
+                        <li><a href="{{ url_for('about') }}">About</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact</h5>
+                    <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                    <p><i class="fas fa-envelope"></i> info@manjunathsalon.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Your City, India</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 MANJUNATH HAIR SALON. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form validation
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            const name = document.querySelector('input[name="name"]').value.trim();
+            const phone = document.querySelector('input[name="phone"]').value.trim();
+            const service = document.querySelector('select[name="service_id"]').value;
+
+            if (!name || !phone || !service) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return false;
+            }
+
+            if (phone.length < 10) {
+                e.preventDefault();
+                alert('Please enter a valid 10-digit phone number.');
+                return false;
+            }
+
+            return true;
+        });
+    </script>
+</body>
+</html>
